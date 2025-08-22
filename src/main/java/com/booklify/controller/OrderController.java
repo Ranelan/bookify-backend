@@ -129,4 +129,12 @@ public class OrderController {
         // Return the list of orders with a 200 OK status
         return ResponseEntity.ok(orders);
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+        if (ex.getMessage() != null && ex.getMessage().startsWith("Order not found")) {
+            return ResponseEntity.status(404).body(ex.getMessage());
+        }
+        return ResponseEntity.status(500).body("Internal Server Error");
+    }
 }
