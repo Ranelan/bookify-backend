@@ -3,6 +3,7 @@ package com.booklify.controller;
 import com.booklify.domain.Admin;
 import com.booklify.domain.RegularUser;
 import com.booklify.dto.AdminDto;
+import com.booklify.dto.BookDto;
 import com.booklify.dto.RegularUserDto;
 import com.booklify.service.impl.AdminService;
 import com.booklify.util.JwtUtil;
@@ -115,65 +116,65 @@ public class AdminController {
     }
 
     // --- Book Management Endpoints ---
-//
-//    @GetMapping("/getAllBooks")
-//    public ResponseEntity<List<BookDto>> viewAllBookListings() {
-//        return ResponseEntity.ok(adminService.viewAllBookListings().stream().map(BookDto::fromEntity).toList());
-//    }
-//
-//    @DeleteMapping("/deleteBook/{bookId}")
-//    public ResponseEntity<Void> deleteBookListingById(@PathVariable Long bookId) {
-//        adminService.deleteBookListingById(bookId);
-//        return ResponseEntity.noContent().build();
-//    }
-//
-//    @PutMapping("/editBook/{bookId}")
-//    public ResponseEntity<BookDto> editBookListingById(@PathVariable Long bookId, @RequestBody BookDto updatedListing) {
-//        // Convert DTO to entity, set user if uploaderId is present
-//        var builder = new com.booklify.domain.Book.Builder()
-//                .setBookID(updatedListing.getBookID())
-//                .setIsbn(updatedListing.getIsbn())
-//                .setTitle(updatedListing.getTitle())
-//                .setAuthor(updatedListing.getAuthor())
-//                .setPublisher(updatedListing.getPublisher())
-//                .setCondition(updatedListing.getCondition())
-//                .setPrice(updatedListing.getPrice())
-//                .setDescription(updatedListing.getDescription())
-//                .setUploadedDate(updatedListing.getUploadedDate())
-//                .setImage(updatedListing.getImage());
-//        if (updatedListing.getUploaderId() != null) {
-//            regularUserRepository.findById(updatedListing.getUploaderId()).ifPresent(builder::setUser);
-//        }
-//        com.booklify.domain.Book bookEntity = builder.build();
-//        adminService.editBookListingById(bookId, bookEntity);
-//        // Return the updated book as DTO
-//        return ResponseEntity.ok(BookDto.fromEntity(bookEntity));
-//    }
-//
-//    @GetMapping("/books/{bookId}")
-//    public ResponseEntity<BookDto> getBookById(@PathVariable Long bookId) {
-//        return ResponseEntity.ok(BookDto.fromEntity(adminService.getBookById(bookId)));
-//    }
-//
-//    @GetMapping("/books/search/title")
-//    public ResponseEntity<List<BookDto>> searchBooksByTitle(@RequestParam String title) {
-//        return ResponseEntity.ok(adminService.searchBooksByTitle(title).stream().map(BookDto::fromEntity).toList());
-//    }
-//
-//    @GetMapping("/books/search/author")
-//    public ResponseEntity<List<BookDto>> searchBooksByAuthor(@RequestParam String author) {
-//        return ResponseEntity.ok(adminService.searchBooksByAuthor(author).stream().map(BookDto::fromEntity).toList());
-//    }
-//
-//    @GetMapping("/books/search/isbn")
-//    public ResponseEntity<List<BookDto>> searchBooksByIsbn(@RequestParam String isbn) {
-//        return ResponseEntity.ok(adminService.searchBooksByIsbn(isbn).stream().map(BookDto::fromEntity).toList());
-//    }
-//
-//    @GetMapping("/books/user/{userId}")
-//    public ResponseEntity<List<BookDto>> findBooksByUserId(@PathVariable Long userId) {
-//        return ResponseEntity.ok(adminService.findBooksByUserId(userId).stream().map(BookDto::fromEntity).toList());
-//    }
+
+    @GetMapping("/getAllBooks")
+    public ResponseEntity<List<BookDto>> viewAllBookListings() {
+        return ResponseEntity.ok(adminService.viewAllBookListings().stream().map(BookDto::fromEntity).toList());
+    }
+
+    @DeleteMapping("/deleteBook/{bookId}")
+    public ResponseEntity<Void> deleteBookListingById(@PathVariable Long bookId) {
+        adminService.deleteBookListingById(bookId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/editBook/{bookId}")
+    public ResponseEntity<BookDto> editBookListingById(@PathVariable Long bookId, @RequestBody BookDto updatedListing) {
+        // Convert DTO to entity, set user if uploaderId is present
+        var builder = new com.booklify.domain.Book.Builder()
+                .setBookID(updatedListing.getBookID())
+                .setIsbn(updatedListing.getIsbn())
+                .setTitle(updatedListing.getTitle())
+                .setAuthor(updatedListing.getAuthor())
+                .setPublisher(updatedListing.getPublisher())
+                .setCondition(updatedListing.getCondition())
+                .setPrice(updatedListing.getPrice())
+                .setDescription(updatedListing.getDescription())
+                .setUploadedDate(updatedListing.getUploadedDate())
+                .setImage(updatedListing.getImage());
+        if (updatedListing.getUserId() != null) {
+            regularUserRepository.findById(updatedListing.getUserId()).ifPresent(builder::setUser);
+        }
+        com.booklify.domain.Book bookEntity = builder.build();
+        adminService.editBookListingById(bookId, bookEntity);
+        // Return the updated book as DTO
+        return ResponseEntity.ok(BookDto.fromEntity(bookEntity));
+    }
+
+    @GetMapping("/books/{bookId}")
+    public ResponseEntity<BookDto> getBookById(@PathVariable Long bookId) {
+        return ResponseEntity.ok(BookDto.fromEntity(adminService.getBookById(bookId)));
+    }
+
+    @GetMapping("/books/search/title")
+    public ResponseEntity<List<BookDto>> searchBooksByTitle(@RequestParam String title) {
+        return ResponseEntity.ok(adminService.searchBooksByTitle(title).stream().map(BookDto::fromEntity).toList());
+    }
+
+    @GetMapping("/books/search/author")
+    public ResponseEntity<List<BookDto>> searchBooksByAuthor(@RequestParam String author) {
+        return ResponseEntity.ok(adminService.searchBooksByAuthor(author).stream().map(BookDto::fromEntity).toList());
+    }
+
+    @GetMapping("/books/search/isbn")
+    public ResponseEntity<List<BookDto>> searchBooksByIsbn(@RequestParam String isbn) {
+        return ResponseEntity.ok(adminService.searchBooksByIsbn(isbn).stream().map(BookDto::fromEntity).toList());
+    }
+
+    @GetMapping("/books/user/{userId}")
+    public ResponseEntity<List<BookDto>> findBooksByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(adminService.findBooksByUserId(userId).stream().map(BookDto::fromEntity).toList());
+    }
 
 
 }

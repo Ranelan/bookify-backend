@@ -1,6 +1,7 @@
 package com.booklify.service;
 
 import com.booklify.domain.Admin;
+import com.booklify.domain.Book;
 import com.booklify.domain.RegularUser;
 import com.booklify.dto.AdminDto;
 
@@ -28,14 +29,14 @@ public interface IAdminService extends IService<Admin, Long> {
 
 
     // Book Listing Management to be implemented in the future when the Book class is defined
-//    List<Book> viewAllBookListings();
-//    void deleteBookListingById(Long bookId);
-//    void editBookListingById(Long bookId, Book updatedListing);
-//    Book getBookById(Long bookId);
-//    List<Book> searchBooksByTitle(String title);
-//    List<Book> searchBooksByAuthor(String author);
-//    List<Book> searchBooksByIsbn(String isbn);
-//    List<Book> findBooksByUserId(Long userId);
+    List<Book> viewAllBookListings();
+    void deleteBookListingById(Long bookId);
+    void editBookListingById(Long bookId, Book updatedListing);
+    Book getBookById(Long bookId);
+    List<Book> searchBooksByTitle(String title);
+    List<Book> searchBooksByAuthor(String author);
+    List<Book> searchBooksByIsbn(String isbn);
+    List<Book> findBooksByUserId(Long userId);
 
 
     // Placeholder methods for future implementation for the reports

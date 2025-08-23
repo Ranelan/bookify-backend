@@ -2,10 +2,12 @@ package com.booklify.service.impl;
 
 import com.booklify.domain.Admin;
 //import com.booklify.domain.Book;
+import com.booklify.domain.Book;
 import com.booklify.domain.RegularUser;
 import com.booklify.domain.enums.Permissions;
 import com.booklify.repository.AdminRepository;
 //import com.booklify.repository.BookRepository;
+import com.booklify.repository.BookRepository;
 import com.booklify.repository.RegularUserRepository;
 import com.booklify.service.IAdminService;
 import com.booklify.util.JwtUtil;
@@ -27,8 +29,8 @@ public class AdminService implements IAdminService {
     @Autowired
     private RegularUserRepository regularUserRepository;
 
-//    @Autowired
-//    private BookRepository bookRepository;
+    @Autowired
+    private BookRepository bookRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -158,60 +160,60 @@ public class AdminService implements IAdminService {
         regularUserRepository.save(user);
     }
 
-//    @Override
-//    public List<Book> viewAllBookListings() {
-//        return bookRepository.findAll();
-//    }
-//
-//    @Override
-//    public void deleteBookListingById(Long bookId) {
-//        bookRepository.deleteById(bookId);
-//    }
-//
-//    @Override
-//    public void editBookListingById(Long bookId, Book updatedListing) {
-//        Book book = bookRepository.findById(bookId)
-//                .orElseThrow(() -> new RuntimeException("Book not found with id: " + bookId));
-//        Book updated = new Book.Builder()
-//                .copy(book)
-//                .setTitle(updatedListing.getTitle())
-//                .setAuthor(updatedListing.getAuthor())
-//                .setCondition(updatedListing.getCondition())
-//                .setPrice(updatedListing.getPrice())
-//                .setDescription(updatedListing.getDescription())
-//                .setIsbn(updatedListing.getIsbn())
-//                .setPublisher(updatedListing.getPublisher())
-//                .setUploadedDate(updatedListing.getUploadedDate())
-//                .setUser(updatedListing.getUser())
-//                .build();
-//        bookRepository.save(updated);
-//    }
-//
-//    @Override
-//    public Book getBookById(Long bookId) {
-//        return bookRepository.findById(bookId)
-//                .orElseThrow(() -> new RuntimeException("Book not found with id: " + bookId));
-//    }
-//
-//    @Override
-//    public List<Book> searchBooksByTitle(String title) {
-//        return bookRepository.findByTitleContainingIgnoreCase(title);
-//    }
-//
-//    @Override
-//    public List<Book> searchBooksByAuthor(String author) {
-//        return bookRepository.findByAuthor(author);
-//    }
-//
-//    @Override
-//    public List<Book> searchBooksByIsbn(String isbn) {
-//        return bookRepository.findByIsbn(isbn);
-//    }
-//
-//    @Override
-//    public List<Book> findBooksByUserId(Long userId) {
-//        return bookRepository.findAll().stream()
-//                .filter(book -> book.getUser() != null && book.getUser().getId().equals(userId))
-//                .toList();
-//    }
+    @Override
+    public List<Book> viewAllBookListings() {
+        return bookRepository.findAll();
+    }
+
+    @Override
+    public void deleteBookListingById(Long bookId) {
+        bookRepository.deleteById(bookId);
+    }
+
+    @Override
+    public void editBookListingById(Long bookId, Book updatedListing) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new RuntimeException("Book not found with id: " + bookId));
+        Book updated = new Book.Builder()
+                .copy(book)
+                .setTitle(updatedListing.getTitle())
+                .setAuthor(updatedListing.getAuthor())
+                .setCondition(updatedListing.getCondition())
+                .setPrice(updatedListing.getPrice())
+                .setDescription(updatedListing.getDescription())
+                .setIsbn(updatedListing.getIsbn())
+                .setPublisher(updatedListing.getPublisher())
+                .setUploadedDate(updatedListing.getUploadedDate())
+                .setUser(updatedListing.getUser())
+                .build();
+        bookRepository.save(updated);
+    }
+
+    @Override
+    public Book getBookById(Long bookId) {
+        return bookRepository.findById(bookId)
+                .orElseThrow(() -> new RuntimeException("Book not found with id: " + bookId));
+    }
+
+    @Override
+    public List<Book> searchBooksByTitle(String title) {
+        return bookRepository.findByTitleContainingIgnoreCase(title);
+    }
+
+    @Override
+    public List<Book> searchBooksByAuthor(String author) {
+        return bookRepository.findByAuthor(author);
+    }
+
+    @Override
+    public List<Book> searchBooksByIsbn(String isbn) {
+        return bookRepository.findByIsbn(isbn);
+    }
+
+    @Override
+    public List<Book> findBooksByUserId(Long userId) {
+        return bookRepository.findAll().stream()
+                .filter(book -> book.getUser() != null && book.getUser().getId().equals(userId))
+                .toList();
+    }
 }
