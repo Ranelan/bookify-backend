@@ -6,18 +6,20 @@ import com.booklify.domain.Order;
 import com.booklify.domain.enums.PaymentStatus;
 import com.booklify.util.Helper;
 
+import java.math.BigDecimal;
+
 public class PaymentFactory {
 
 
     public static Payment createPayment(User user,
                                         Order order,
                                         String paymentMethod,
-                                        double amount,
+                                        BigDecimal amount,
                                         PaymentStatus paymentStatus) {
 
         if (user == null || order == null ||
                 Helper.isNullOrEmpty(paymentMethod) ||
-                !Helper.isValidAmount(amount) ||
+                amount == null || amount.compareTo(BigDecimal.ZERO) <= 0 ||
                 paymentStatus == null) {
             return null;
         }

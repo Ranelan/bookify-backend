@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -113,8 +114,8 @@ public class PaymentController {
     }
 
     @PostMapping("/{paymentId}/refund")
-    public ResponseEntity<Void> refundPayment(@PathVariable Long paymentId, @RequestParam double amount) {
-        if (paymentId == null || amount <= 0) {
+    public ResponseEntity<Void> refundPayment(@PathVariable Long paymentId, @RequestParam BigDecimal amount) {
+        if (paymentId == null || amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             return ResponseEntity.badRequest().build();
         }
 
