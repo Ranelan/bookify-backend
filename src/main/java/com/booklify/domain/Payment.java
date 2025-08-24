@@ -2,6 +2,7 @@ package com.booklify.domain;
 
 import com.booklify.domain.enums.PaymentStatus;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
@@ -29,7 +30,7 @@ public class Payment {
     private PaymentStatus paymentStatus;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private double amountPaid;
+    private BigDecimal amountPaid;
 
     @Column(name = "payment_date", nullable = false, updatable = false)
     private LocalDateTime paymentDate = LocalDateTime.now();
@@ -69,7 +70,7 @@ public class Payment {
         return paymentStatus;
     }
 
-    public double getAmountPaid() {
+    public BigDecimal getAmountPaid() {
         return amountPaid;
     }
 
@@ -87,7 +88,7 @@ public class Payment {
         private Order order;
         private String paymentMethod;
         private PaymentStatus paymentStatus;
-        private double amountPaid;
+        private BigDecimal amountPaid;
         private LocalDateTime paymentDate;
 
         public Builder setPaymentId(Long paymentId) {
@@ -120,7 +121,7 @@ public class Payment {
             return this;
         }
 
-        public Builder setAmountPaid(double amountPaid) {
+        public Builder setAmountPaid(BigDecimal amountPaid) {
             this.amountPaid = amountPaid;
             return this;
         }
