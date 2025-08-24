@@ -9,6 +9,7 @@ import com.booklify.service.IPaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -76,13 +77,13 @@ public class PaymentService implements IPaymentService {
     }
 
     @Override
-    public boolean processRefund(Long paymentId, double amount) {
+    public boolean processRefund(Long paymentId, BigDecimal amount) {
         Payment payment = findById(paymentId);
 
         if (payment.getPaymentStatus() != PaymentStatus.COMPLETED) {
             throw new RuntimeException("Only completed payments can be refunded");
         }
-        if (amount <= 0 || amount > payment.getAmountPaid()) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0 || amount.compareTo(payment.getAmountPaid()) > 0) {
             throw new RuntimeException("Refund amount must be positive and ≤ original payment");
         }
 
@@ -104,4 +105,3 @@ public class PaymentService implements IPaymentService {
         }
     }
 }
-
