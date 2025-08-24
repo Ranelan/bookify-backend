@@ -1,6 +1,7 @@
 package com.booklify.controller;
 import com.booklify.domain.Book;
 
+import com.booklify.domain.RegularUser;
 import com.booklify.service.impl.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -27,8 +28,19 @@ public class BookController {
     private RegularUserRepository regularUserRepository;
 
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BookDto> create(@RequestPart("bookRequest") BookDto bookDto,
-                                          @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
+    public ResponseEntity<?> create(@RequestPart("bookRequest") BookDto bookDto,
+                                    @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
+
+        System.out.println("BookController.create called. BookDto: " + bookDto);
+
+        if (bookDto.getUserId() == null) {
+            return ResponseEntity.badRequest().body("UploaderId is required.");
+        }
+        RegularUser user = regularUserRepository.findById(bookDto.getUserId())
+                .orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
         Book.Builder builder = new Book.Builder()
                 .setBookID(bookDto.getBookID())
                 .setIsbn(bookDto.getIsbn())
@@ -38,14 +50,14 @@ public class BookController {
                 .setCondition(bookDto.getCondition())
                 .setPrice(bookDto.getPrice())
                 .setDescription(bookDto.getDescription())
-                .setUploadedDate(bookDto.getUploadedDate());
-        if (bookDto.getUploaderId() != null) {
-            regularUserRepository.findById(bookDto.getUploaderId()).ifPresent(builder::setUser);
-        }
+                .setUploadedDate(bookDto.getUploadedDate())
+                .setUser(user); // Always set user
+
         if (imageFile != null && !imageFile.isEmpty()) {
             builder.setImage(imageFile.getBytes());
         }
-        return ResponseEntity.ok(BookDto.fromEntity(service.save(builder.build())));
+        Book savedBook = service.save(builder.build());
+        return ResponseEntity.ok(BookDto.fromEntity(savedBook));
     }
 
 
@@ -61,6 +73,8 @@ public class BookController {
     @PostMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BookDto> update(@RequestPart("bookRequest") BookDto bookDto,
                                           @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
+
+        System.out.println("Received BookDto: " + bookDto);
         Book.Builder builder = new Book.Builder()
                 .setBookID(bookDto.getBookID())
                 .setIsbn(bookDto.getIsbn())
@@ -71,8 +85,8 @@ public class BookController {
                 .setPrice(bookDto.getPrice())
                 .setDescription(bookDto.getDescription())
                 .setUploadedDate(bookDto.getUploadedDate());
-        if (bookDto.getUploaderId() != null) {
-            regularUserRepository.findById(bookDto.getUploaderId()).ifPresent(builder::setUser);
+        if (bookDto.getUserId() != null) {
+            regularUserRepository.findById(bookDto.getUserId()).ifPresent(builder::setUser);
         }
         if (imageFile != null && !imageFile.isEmpty()) {
             builder.setImage(imageFile.getBytes());

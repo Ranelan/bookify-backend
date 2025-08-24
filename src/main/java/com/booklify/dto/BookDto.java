@@ -17,7 +17,7 @@ public class BookDto {
     private String description;
     private LocalDateTime uploadedDate;
     private byte[] image;
-    private Long uploaderId;
+    private Long userId;
     private String uploaderName;
     private String uploaderEmail;
 
@@ -53,7 +53,7 @@ public class BookDto {
                 book.getImage()
         );
         if (book.getUser() != null) {
-            dto.setUploaderId(book.getUser().getId());
+            dto.setUserId(book.getUser().getId());
             dto.setUploaderName(book.getUser().getFullName());
             dto.setUploaderEmail(book.getUser().getEmail());
         }
@@ -158,12 +158,12 @@ public class BookDto {
         this.image = image;
     }
 
-    public Long getUploaderId() {
-        return uploaderId;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUploaderId(Long uploaderId) {
-        this.uploaderId = uploaderId;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getUploaderName() {
@@ -177,6 +177,24 @@ public class BookDto {
     }
     public void setUploaderEmail(String uploaderEmail) {
         this.uploaderEmail = uploaderEmail;
+    }
+
+    @Override
+    public String toString() {
+        return "BookDto{" +
+                "bookID=" + bookID +
+                ", isbn='" + isbn + '\'' +
+                ", title='" + title + '\'' +
+                ", author='" + author + '\'' +
+                ", publisher='" + publisher + '\'' +
+                ", condition=" + condition +
+                ", price=" + price +
+                ", description='" + description + '\'' +
+                ", uploadedDate=" + uploadedDate +
+                ", UserId =" + userId +
+                ", uploaderName='" + uploaderName + '\'' +
+                ", uploaderEmail='" + uploaderEmail + '\'' +
+                '}';
     }
 
 }
