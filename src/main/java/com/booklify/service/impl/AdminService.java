@@ -1,19 +1,20 @@
 package com.booklify.service.impl;
 
-import com.booklify.domain.Admin;
+import com.booklify.domain.*;
 //import com.booklify.domain.Book;
-import com.booklify.domain.RegularUser;
+import com.booklify.domain.enums.OrderStatus;
 import com.booklify.domain.enums.Permissions;
-import com.booklify.repository.AdminRepository;
+import com.booklify.repository.*;
 //import com.booklify.repository.BookRepository;
-import com.booklify.repository.RegularUserRepository;
 import com.booklify.service.IAdminService;
 import com.booklify.util.JwtUtil;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -27,11 +28,18 @@ public class AdminService implements IAdminService {
     @Autowired
     private RegularUserRepository regularUserRepository;
 
-//    @Autowired
-//    private BookRepository bookRepository;
+    @Autowired
+    private BookRepository bookRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderItemRepository orderItemRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -134,6 +142,8 @@ public class AdminService implements IAdminService {
         return updated;
     }
 
+
+    // Regular User Management Methods
     @Override
     public List<RegularUser> viewAllRegularUsers() {
         return regularUserRepository.findAll();
@@ -158,60 +168,125 @@ public class AdminService implements IAdminService {
         regularUserRepository.save(user);
     }
 
-//    @Override
-//    public List<Book> viewAllBookListings() {
-//        return bookRepository.findAll();
-//    }
-//
-//    @Override
-//    public void deleteBookListingById(Long bookId) {
-//        bookRepository.deleteById(bookId);
-//    }
-//
-//    @Override
-//    public void editBookListingById(Long bookId, Book updatedListing) {
-//        Book book = bookRepository.findById(bookId)
-//                .orElseThrow(() -> new RuntimeException("Book not found with id: " + bookId));
-//        Book updated = new Book.Builder()
-//                .copy(book)
-//                .setTitle(updatedListing.getTitle())
-//                .setAuthor(updatedListing.getAuthor())
-//                .setCondition(updatedListing.getCondition())
-//                .setPrice(updatedListing.getPrice())
-//                .setDescription(updatedListing.getDescription())
-//                .setIsbn(updatedListing.getIsbn())
-//                .setPublisher(updatedListing.getPublisher())
-//                .setUploadedDate(updatedListing.getUploadedDate())
-//                .setUser(updatedListing.getUser())
-//                .build();
-//        bookRepository.save(updated);
-//    }
-//
-//    @Override
-//    public Book getBookById(Long bookId) {
-//        return bookRepository.findById(bookId)
-//                .orElseThrow(() -> new RuntimeException("Book not found with id: " + bookId));
-//    }
-//
-//    @Override
-//    public List<Book> searchBooksByTitle(String title) {
-//        return bookRepository.findByTitleContainingIgnoreCase(title);
-//    }
-//
-//    @Override
-//    public List<Book> searchBooksByAuthor(String author) {
-//        return bookRepository.findByAuthor(author);
-//    }
-//
-//    @Override
-//    public List<Book> searchBooksByIsbn(String isbn) {
-//        return bookRepository.findByIsbn(isbn);
-//    }
-//
-//    @Override
-//    public List<Book> findBooksByUserId(Long userId) {
-//        return bookRepository.findAll().stream()
-//                .filter(book -> book.getUser() != null && book.getUser().getId().equals(userId))
-//                .toList();
-//    }
+    // Book Management Methods
+    @Override
+    public List<Book> viewAllBookListings() {
+        return bookRepository.findAll();
+    }
+
+    @Override
+    public void deleteBookListingById(Long bookId) {
+        bookRepository.deleteById(bookId);
+    }
+
+    @Override
+    public void editBookListingById(Long bookId, Book updatedListing) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new RuntimeException("Book not found with id: " + bookId));
+        Book updated = new Book.Builder()
+                .copy(book)
+                .setTitle(updatedListing.getTitle())
+                .setAuthor(updatedListing.getAuthor())
+                .setCondition(updatedListing.getCondition())
+                .setPrice(updatedListing.getPrice())
+                .setDescription(updatedListing.getDescription())
+                .setIsbn(updatedListing.getIsbn())
+                .setPublisher(updatedListing.getPublisher())
+                .setUploadedDate(updatedListing.getUploadedDate())
+                .setUser(updatedListing.getUser())
+                .build();
+        bookRepository.save(updated);
+    }
+
+    @Override
+    public Book getBookById(Long bookId) {
+        return bookRepository.findById(bookId)
+                .orElseThrow(() -> new RuntimeException("Book not found with id: " + bookId));
+    }
+
+    @Override
+    public List<Book> searchBooksByTitle(String title) {
+        return bookRepository.findByTitleContainingIgnoreCase(title);
+    }
+
+    @Override
+    public List<Book> searchBooksByAuthor(String author) {
+        return bookRepository.findByAuthor(author);
+    }
+
+    @Override
+    public List<Book> searchBooksByIsbn(String isbn) {
+        return bookRepository.findByIsbn(isbn);
+    }
+
+    @Override
+    public List<Book> findBooksByUserId(Long userId) {
+        return bookRepository.findAll().stream()
+                .filter(book -> book.getUser() != null && book.getUser().getId().equals(userId))
+                .toList();
+    }
+
+
+    // Order Management Methods
+    @Override
+    public List<Order> viewAllOrders() {
+        return orderRepository.findAll();
+    }
+
+    @Override
+    @Transactional
+    public void updateOrderItemStatus(Long orderItemId, String newStatus) {
+        OrderItem orderItem = orderItemRepository.findById(orderItemId)
+                .orElseThrow(() -> new RuntimeException("OrderItem not found with id: " + orderItemId));
+        try {
+            OrderStatus statusEnum = OrderStatus.valueOf(newStatus.toUpperCase());
+            orderItem.setOrderStatus(statusEnum);
+            orderItemRepository.save(orderItem);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid order status: " + newStatus);
+        }
+    }
+
+    @Override
+    public List<OrderItem> viewAllOrderItems() {
+        return orderItemRepository.findAll();
+    }
+
+    @Override
+    public List<Order> searchOrdersByUserId(Long userId) {
+        return orderRepository.findByRegularUserId(userId);
+    }
+
+    @Override
+    public List<OrderItem> searchOrderItemsByOrderId(Long orderId) {
+        return orderItemRepository.findByOrder_OrderId(orderId);
+    }
+
+    @Override
+    public List<OrderItem> searchOrderItemsByStatus(String status) {
+        try {
+            com.booklify.domain.enums.OrderStatus orderStatus = com.booklify.domain.enums.OrderStatus.valueOf(status);
+            return orderItemRepository.findByOrderStatus(orderStatus);
+        } catch (IllegalArgumentException e) {
+            return List.of();
+        }
+    }
+
+    @Override
+    public Double calculateTotalRevenue() {
+        // The logic is now simpler: just call the repository method that sums everything.
+        return orderItemRepository.sumTotalAmountOfAllItems();
+    }
+
+    @Override
+    public Double calculateRevenueByDateRange(String startDate, String endDate) {
+        // Date parsing remains the same.
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        LocalDateTime start = LocalDateTime.parse(startDate, formatter);
+        LocalDateTime end = LocalDateTime.parse(endDate, formatter);
+
+        // The repository call is now simpler and does not filter by status.
+        return orderItemRepository.sumTotalAmountByOrderDateBetween(start, end);
+    }
+
 }

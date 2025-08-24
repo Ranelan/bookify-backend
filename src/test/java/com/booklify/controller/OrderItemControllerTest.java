@@ -93,6 +93,9 @@ class OrderItemControllerTest {
         OrderItem saved = orderItemRepository.save(orderItem);
         assertNotNull(saved.getOrderItemId(), "OrderItem ID should not be null after save");
         assertEquals(order.getOrderId(), saved.getOrder().getOrderId(), "OrderItem should be linked to the correct order");
+        // Assert totalAmount is correctly calculated
+        double expectedTotal = 2 * book.getPrice();
+        assertEquals(expectedTotal, saved.getTotalAmount(), 0.0001, "Total amount should be automatically calculated on save.");
     }
 
     @Test
@@ -115,6 +118,9 @@ class OrderItemControllerTest {
                 .build();
         OrderItem updated = orderItemRepository.save(updatedOrderItem);
         assertEquals(5, updated.getQuantity(), "OrderItem quantity should be updated");
+        // Assert totalAmount is recalculated
+        double expectedTotal = 5 * book.getPrice();
+        assertEquals(expectedTotal, updated.getTotalAmount(), 0.0001, "Total amount should be recalculated on update.");
     }
 
     @Test
@@ -148,6 +154,9 @@ class OrderItemControllerTest {
         OrderItem found = orderItemRepository.findById(id).orElse(null);
         assertNotNull(found, "OrderItem should be found by ID");
         assertEquals(4, found.getQuantity());
+        // Assert totalAmount is correct
+        double expectedTotal = 4 * book.getPrice();
+        assertEquals(expectedTotal, found.getTotalAmount(), 0.0001, "Total amount should match quantity * price.");
     }
 
     @Test
@@ -222,5 +231,3 @@ class OrderItemControllerTest {
         assertFalse(found.isEmpty(), "Should find order items by book ID");
     }
 }
-
-

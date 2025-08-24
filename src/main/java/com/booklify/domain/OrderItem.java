@@ -12,36 +12,55 @@ public class OrderItem {
     private Long orderItemId;
 
     private int quantity;
+
+    // This will now be a calculated field
     private double totalAmount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus orderStatus;
 
-    @Column(name = "bookid", nullable = false)
+    // This field is redundant if you have the Book object.
+    // It's better to rely on the relationship itself.
+    @Column(name = "bookid", insertable = false, updatable = false)
     private Long bookid;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY) // Using LAZY fetch is generally better for performance
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    // Default constructor (JPA requirement)
+    // JPA requirement
     public OrderItem() {}
 
     // Builder-based constructor
     private OrderItem(OrderItemBuilder orderItemBuilder) {
         this.orderItemId = orderItemBuilder.orderItemId;
         this.quantity = orderItemBuilder.quantity;
-        this.totalAmount = orderItemBuilder.totalAmount;
         this.orderStatus = orderItemBuilder.orderStatus;
         this.book = orderItemBuilder.book;
         this.order = orderItemBuilder.order;
-        this.bookid = orderItemBuilder.book != null ? orderItemBuilder.book.getBookID() : null;
+        // The totalAmount is now set by the builder's calculation
+        this.totalAmount = orderItemBuilder.totalAmount;
     }
+
+    // --- JPA Lifecycle Callback ---
+    // This method will automatically run before the entity is saved for the first time or updated.
+    // It's a safety net to ensure the totalAmount is always correct.
+    @PrePersist
+    @PreUpdate
+    public void calculateTotalAmount() {
+        if (getBook() != null && getQuantity() > 0) {
+            // Assuming your Book entity has a getPrice() method
+            this.setTotalAmount(getBook().getPrice() * getQuantity());
+        } else {
+            this.setTotalAmount(0.0);
+        }
+    }
+
 
     // Getters
     public Long getOrderItemId() {
@@ -69,9 +88,17 @@ public class OrderItem {
     }
 
     public Long getBookid() {
-        return bookid;
+        // Derive this from the book object to avoid inconsistencies
+        return book != null ? book.getBookID() : null;
     }
 
+    // Add a setter for the calculated field, mainly for the callback to use
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+
+    // ... toString method ...
     @Override
     public String toString() {
         return "OrderItem{" +
@@ -79,17 +106,28 @@ public class OrderItem {
                 ", quantity=" + quantity +
                 ", totalAmount=" + totalAmount +
                 ", orderStatus=" + orderStatus +
-                ", bookid=" + bookid +
-                ", book=" + book +
-                ", order=" + order +
+                ", book=" + (book != null ? book.getBookID() : "null") +
+                ", order=" + (order != null ? order.getOrderId() : "null") +
                 '}';
     }
 
-    // Builder class
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public void setOrderItemId(Long orderItemId) {
+        this.orderItemId = orderItemId;
+    }
+
+    // --- Updated Builder Class ---
     public static class OrderItemBuilder {
         private Long orderItemId;
         private int quantity;
-        private double totalAmount;
+        private double totalAmount; // Keep this private to store the calculated value
         private OrderStatus orderStatus;
         private Book book;
         private Order order;
@@ -104,10 +142,8 @@ public class OrderItem {
             return this;
         }
 
-        public OrderItemBuilder setTotalAmount(double totalAmount) {
-            this.totalAmount = totalAmount;
-            return this;
-        }
+        // REMOVED: Do not allow external setting of the total amount.
+        // public OrderItemBuilder setTotalAmount(double totalAmount) { ... }
 
         public OrderItemBuilder setOrderStatus(OrderStatus orderStatus) {
             this.orderStatus = orderStatus;
@@ -127,14 +163,29 @@ public class OrderItem {
         public OrderItemBuilder copy(OrderItem orderItem) {
             this.orderItemId = orderItem.orderItemId;
             this.quantity = orderItem.quantity;
-            this.totalAmount = orderItem.totalAmount;
             this.orderStatus = orderItem.orderStatus;
             this.book = orderItem.book;
             this.order = orderItem.order;
+            // Recalculate when copying to be safe
+            if (this.book != null && this.quantity > 0) {
+                this.totalAmount = this.book.getPrice() * this.quantity;
+            }
             return this;
         }
 
         public OrderItem build() {
+            // Validation and Calculation logic is now here
+            if (book == null) {
+                throw new IllegalStateException("Book cannot be null when building an OrderItem.");
+            }
+            if (quantity <= 0) {
+                throw new IllegalStateException("Quantity must be greater than 0.");
+            }
+
+            // THE KEY CHANGE: Calculate the total amount automatically
+            // Assumes your Book class has a getPrice() method that returns a double
+            this.totalAmount = book.getPrice() * this.quantity;
+
             return new OrderItem(this);
         }
     }
