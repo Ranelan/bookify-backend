@@ -61,5 +61,10 @@ public class BookService implements IBookService {
     public List<Book> findByAuthor(String author) {
         return bookRepo.findByAuthor(author);
     }
+
+    @Override
+    public List<Book> findByUserId(Long userId) {
+        return bookRepo.findByUserId(userId);
+    }
 }
 

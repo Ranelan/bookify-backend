@@ -21,7 +21,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     List<Book> findByIsbn(String isbn);
 
-//    List<Book> findBySeller_Id(Long sellerId);
+    List<Book> findByUserId(Long userId);
 
     @Query("SELECT b FROM Book b WHERE b.price > :minPrice AND b.condition = :condition")
     List<Book> findBooksByMinPriceAndCondition(@Param("minPrice") Double minPrice, @Param("condition") BookCondition condition);
