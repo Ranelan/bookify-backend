@@ -29,15 +29,18 @@ public class Address{
     @Column(nullable = false)
     protected String postalCode;
 
-    @OneToOne(mappedBy = "address")
+    @OneToOne
     private RegularUser user;
-    @OneToMany(mappedBy = "shippingAddress")
-    private List<Order> order;
+
+    @OneToMany
+    @JoinColumn(name = "shipping_address_id")
+    private List<Order> orders;
 
 
     protected Address(){
 
     }
+
 
     private Address(Builder builder){
         this.street = builder.street;
@@ -46,17 +49,20 @@ public class Address{
         this.province=builder.province;
         this.country=builder.country;
         this.postalCode=builder.postalCode;
-
+        this.user = builder.user;
+        this.orders = builder.orders;
 
     }
 
-    public Address(String street, String city,String suburb,String province,String country,String postalCode) {
+    public Address(String street, String city,String suburb,String province,String country,String postalCode, RegularUser user, List<Order> orders) {
         this.street = street;
         this.suburb= suburb;
         this.city=city;
         this.province=province;
         this.country=country;
         this.postalCode=postalCode;
+        this.user = user;
+        this.orders = orders;
     }
 
 
@@ -85,13 +91,18 @@ public class Address{
         return postalCode;
     }
 
-    /*public RegularUser getUser() {
+    public RegularUser getUser() {
         return user;
     }
 
     public List<Order> getOrders() {
-        return order;
-    }*/
+        return orders;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
 
     @Override
     public String toString() {
@@ -149,7 +160,7 @@ public class Address{
             return this;
         }
 
-        public Builder setOrders(List<Order> orders) {
+        public Builder setOrder(List<Order> orders) {
             this.orders = orders;
             return this;
         }
@@ -161,7 +172,7 @@ public class Address{
             this.province=address.province;
             this.country=address.country;
             this.postalCode= address.postalCode;
-            this.orders= address.order;
+            this.orders= address.orders;
             this.user= address.user;
             return this;
 
