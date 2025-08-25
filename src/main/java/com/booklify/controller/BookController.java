@@ -148,5 +148,15 @@ public class BookController {
         List<BookDto> dtos = books.stream().map(BookDto::fromEntity).collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<BookDto>> getBooksByUserId(@PathVariable Long userId) {
+        List<Book> books = service.findByUserId(userId);
+        if (books.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        List<BookDto> dtos = books.stream().map(BookDto::fromEntity).collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
+    }
 }
 

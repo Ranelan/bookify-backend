@@ -9,5 +9,6 @@ public interface IBookService extends IService<Book, Long>{
     List<Book> findByIsbn(String isbn);
     List<Book> findByTitleContainingIgnoreCase(String title);
     List<Book> findByAuthor(String author);
+    List<Book> findByUserId(Long userId);
 }
 
