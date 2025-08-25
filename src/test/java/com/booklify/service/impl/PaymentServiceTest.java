@@ -9,9 +9,9 @@ import com.booklify.repository.RegularUserRepository;
 import com.booklify.repository.OrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -62,7 +62,7 @@ class PaymentServiceTest {
                 .setUser(createDummyUser())
                 .setOrder(createDummyOrder())
                 .setPaymentMethod("Card")
-                .setAmountPaid(100.0)
+                .setAmountPaid(BigDecimal.valueOf(100.0))
                 .setPaymentStatus(PaymentStatus.COMPLETED)
                 .build();
     }
@@ -106,7 +106,7 @@ class PaymentServiceTest {
         when(paymentRepository.findById(1L)).thenReturn(Optional.of(payment));
         when(paymentRepository.save(any(Payment.class))).thenReturn(payment);
 
-        boolean result = paymentService.processRefund(1L, 50.0);
+        boolean result = paymentService.processRefund(1L, BigDecimal.valueOf(50.0));
 
         assertTrue(result);
         verify(paymentRepository, times(1)).save(any(Payment.class));
@@ -118,9 +118,8 @@ class PaymentServiceTest {
         when(paymentRepository.findById(1L)).thenReturn(Optional.of(payment));
 
         RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> paymentService.processRefund(1L, 200.0));
+                () -> paymentService.processRefund(1L, BigDecimal.valueOf(200.0)));
 
         assertEquals("Refund amount must be positive and ≤ original payment", exception.getMessage());
     }
 }
-
