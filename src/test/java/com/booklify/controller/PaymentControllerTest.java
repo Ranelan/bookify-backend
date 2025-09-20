@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Collections;
 
@@ -35,7 +36,7 @@ class PaymentControllerTest {
                 .setUser(new User())
                 .setOrder(new Order())
                 .setPaymentMethod("Card")
-                .setAmountPaid(100.0)
+                .setAmountPaid(BigDecimal.valueOf(100.0))
                 .setPaymentStatus(PaymentStatus.COMPLETED)
                 .build();
     }
@@ -77,7 +78,7 @@ class PaymentControllerTest {
 
     @Test
     void refundPayment_InvalidAmount_ReturnsBadRequest() {
-        ResponseEntity<Void> response = paymentController.refundPayment(1L, -50.0);
+        ResponseEntity<Void> response = paymentController.refundPayment(1L, BigDecimal.valueOf(-50.0));
         assertEquals(400, response.getStatusCodeValue());
     }
 }

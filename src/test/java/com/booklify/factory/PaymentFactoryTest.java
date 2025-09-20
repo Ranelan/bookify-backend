@@ -6,6 +6,8 @@ import com.booklify.domain.Order;
 import com.booklify.domain.enums.PaymentStatus;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class PaymentFactoryTest {
@@ -25,14 +27,14 @@ class PaymentFactoryTest {
     @Test
     void createPayment_NullUser_ReturnsNull() {
         Order order = createDummyOrder();
-        Payment payment = PaymentFactory.createPayment(null, order, "Card", 100.0, PaymentStatus.COMPLETED);
+        Payment payment = PaymentFactory.createPayment(null, order, "Card", BigDecimal.valueOf(300.00), PaymentStatus.COMPLETED);
         assertNull(payment);
     }
 
     @Test
     void createPayment_NullOrder_ReturnsNull() {
         User user = createDummyUser();
-        Payment payment = PaymentFactory.createPayment(user, null, "Card", 100.0, PaymentStatus.COMPLETED);
+        Payment payment = PaymentFactory.createPayment(user, null, "Card", BigDecimal.valueOf(100.0), PaymentStatus.COMPLETED);
         assertNull(payment);
     }
 
@@ -40,7 +42,7 @@ class PaymentFactoryTest {
     void createPayment_InvalidAmount_ReturnsNull() {
         User user = createDummyUser();
         Order order = createDummyOrder();
-        Payment payment = PaymentFactory.createPayment(user, order, "Card", -50.0, PaymentStatus.COMPLETED);
+        Payment payment = PaymentFactory.createPayment(user, order, "Card", BigDecimal.valueOf(-50.0), PaymentStatus.COMPLETED);
         assertNull(payment);
     }
 
@@ -48,7 +50,7 @@ class PaymentFactoryTest {
     void createPayment_NullPaymentStatus_ReturnsNull() {
         User user = createDummyUser();
         Order order = createDummyOrder();
-        Payment payment = PaymentFactory.createPayment(user, order, "Card", 100.0, null);
+        Payment payment = PaymentFactory.createPayment(user, order, "Card", BigDecimal.valueOf(100.0), null);
         assertNull(payment);
     }
 
@@ -56,7 +58,7 @@ class PaymentFactoryTest {
     void createPayment_ValidData_ReturnsPayment() {
         User user = createDummyUser();
         Order order = createDummyOrder();
-        Payment payment = PaymentFactory.createPayment(user, order, "Card", 100.0, PaymentStatus.COMPLETED);
+        Payment payment = PaymentFactory.createPayment(user, order, "Card", BigDecimal.valueOf(100.0), PaymentStatus.COMPLETED);
         assertNotNull(payment);
     }
 }
