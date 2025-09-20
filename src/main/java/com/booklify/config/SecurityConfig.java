@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/book/create").permitAll()
                         .requestMatchers("/reviews/**").permitAll()
                         .requestMatchers("/api/payments/**").permitAll()
+                        .requestMatchers("/api/cart/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

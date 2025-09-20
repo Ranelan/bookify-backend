@@ -1,10 +1,15 @@
 package com.booklify.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 import java.time.LocalDateTime;
+
 
 public class RegularUserDto {
     private Long id;
+    @NotBlank(message = "Full name is required")
     private String fullName;
+    @NotBlank(message = "Email is required")
     private String email;
     private String password;  // Added this field
     private LocalDateTime dateJoined;
