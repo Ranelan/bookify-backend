@@ -58,6 +58,18 @@ public class RegularUser extends User{
         return lastLogin;
     }
 
+    public void setSellerRating(Double sellerRating) {
+        this.sellerRating = sellerRating;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public void setLastLogin(LocalDateTime lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
     @Override
     public String toString() {
         return "RegularUser{" +
