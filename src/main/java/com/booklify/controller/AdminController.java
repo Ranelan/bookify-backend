@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import com.booklify.repository.RegularUserRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -51,6 +52,16 @@ public class AdminController {
     public ResponseEntity<AdminDto> getAdmin(@PathVariable Long id) {
         Admin admin = adminService.findById(id);
         return ResponseEntity.ok(AdminDto.fromEntity(admin));
+    }
+
+    @GetMapping("/getByEmail")
+    public ResponseEntity<AdminDto> getAdminByEmail(@RequestParam String email) {
+        Optional<Admin> adminOpt = adminService.findByEmail(email);
+        if (adminOpt.isPresent()) {
+            return ResponseEntity.ok(AdminDto.fromEntity(adminOpt.get()));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/update/{id}")
