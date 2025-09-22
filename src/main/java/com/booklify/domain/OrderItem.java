@@ -20,10 +20,6 @@ public class OrderItem {
     @Column(nullable = false)
     private OrderStatus orderStatus;
 
-    // This field is redundant if you have the Book object.
-    // It's better to rely on the relationship itself.
-    @Column(name = "bookid", insertable = false, updatable = false)
-    private Long bookid;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY) // Using LAZY fetch is generally better for performance
     @JoinColumn(name = "book_id", nullable = false)
@@ -31,6 +27,7 @@ public class OrderItem {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonBackReference
     private Order order;
 
     // JPA requirement
@@ -87,9 +84,8 @@ public class OrderItem {
         return order;
     }
 
-    public Long getBookid() {
-        // Derive this from the book object to avoid inconsistencies
-        return book != null ? book.getBookID() : null;
+    public double getPrice() {
+        return book != null ? book.getPrice() : 0.0;
     }
 
     // Add a setter for the calculated field, mainly for the callback to use
@@ -121,6 +117,14 @@ public class OrderItem {
 
     public void setOrderItemId(Long orderItemId) {
         this.orderItemId = orderItemId;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
+    public void setBook(Book book) {
+        this.book = book;
     }
 
     // --- Updated Builder Class ---
@@ -182,8 +186,7 @@ public class OrderItem {
                 throw new IllegalStateException("Quantity must be greater than 0.");
             }
 
-            // THE KEY CHANGE: Calculate the total amount automatically
-            // Assumes your Book class has a getPrice() method that returns a double
+            // THE KEY CHANGE: Calculate the total amount automaticall
             this.totalAmount = book.getPrice() * this.quantity;
 
             return new OrderItem(this);
