@@ -1,7 +1,10 @@
 package com.booklify.controller;
 
+import com.booklify.domain.Order;
 import com.booklify.domain.Payment;
+import com.booklify.domain.RegularUser;
 import com.booklify.domain.enums.PaymentStatus;
+import com.booklify.dto.PaymentRequestDTO;
 import com.booklify.service.IPaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +27,18 @@ public class PaymentController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Payment> createPayment(@RequestBody Payment payment) {
-        if (payment == null) {
+    public ResponseEntity<Payment> createPayment(@RequestBody PaymentRequestDTO paymentRequest) {
+        if (paymentRequest == null) {
             return ResponseEntity.badRequest().build();
         }
+        // Build a Payment object with only user, order, and method
+        Payment payment = new Payment.Builder()
+                .setUser(new RegularUser.RegularUserBuilder().setId(paymentRequest.getUserId()).build())
+                .setOrder(new Order.OrderBuilder().setOrderId(paymentRequest.getOrderId()).build())
+                .setPaymentMethod(paymentRequest.getPaymentMethod())
+                .setPaymentStatus(PaymentStatus.PENDING)
+                .build();
+
         Payment savedPayment = paymentService.save(payment);
         return ResponseEntity.status(201).body(savedPayment);
     }

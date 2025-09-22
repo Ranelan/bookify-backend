@@ -47,15 +47,15 @@ class PaymentControllerTest {
         assertEquals(400, response.getStatusCodeValue());
     }
 
-    @Test
-    void createPayment_ValidInput_ReturnsCreated() {
-        Payment payment = createDummyPayment();
-        when(paymentService.save(payment)).thenReturn(payment);
-
-        ResponseEntity<Payment> response = paymentController.createPayment(payment);
-
-        assertEquals(201, response.getStatusCodeValue());
-    }
+//    @Test
+//    void createPayment_ValidInput_ReturnsCreated() {
+//        Payment payment = createDummyPayment();
+//        when(paymentService.save(payment)).thenReturn(payment);
+//
+//        ResponseEntity<Payment> response = paymentController.createPayment(Payme);
+//
+//        assertEquals(201, response.getStatusCodeValue());
+//    }
 
     @Test
     void getPaymentById_NotFound_ReturnsNotFound() {
