@@ -4,6 +4,6 @@ import com.booklify.domain.Cart;
 
 public interface ICartService extends IService <Cart, Long> {
 
-    Cart findByRegularUserId(Long id);
+    Cart getCartByUserId(Long userId);
     Cart updateCartItemQuantity(Long cartId, Long bookId, int quantity);
 }
