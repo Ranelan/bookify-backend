@@ -1,8 +1,9 @@
 package com.booklify.config;
 
 import com.booklify.domain.Admin;
-
+import com.booklify.domain.RegularUser;
 import com.booklify.service.impl.AdminService;
+import com.booklify.service.impl.RegularUserService;
 import com.booklify.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,11 +28,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final AdminService adminService;
+    private final RegularUserService regularUserService;
 
     @Autowired
-    public JwtAuthFilter(JwtUtil jwtUtil,@Lazy AdminService adminService) {
+    public JwtAuthFilter(JwtUtil jwtUtil,@Lazy AdminService adminService, @Lazy RegularUserService regularUserService) {
         this.jwtUtil = jwtUtil;
         this.adminService = adminService;
+        this.regularUserService = regularUserService;
     }
 
     @Override
@@ -49,14 +52,31 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String email = jwtUtil.extractUsername(token);
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                adminService.findByEmail(email).ifPresent(admin -> {
-                    if (jwtUtil.isTokenValid(token, admin.getEmail())) {
-                        UsernamePasswordAuthenticationToken authToken =
-                                new UsernamePasswordAuthenticationToken(admin, null, null);
-                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authToken);
-                    }
-                });
+                boolean authenticated = false;
+                // Try admin authentication
+                if (!authenticated) {
+                    authenticated = adminService.findByEmail(email).map(admin -> {
+                        if (jwtUtil.isTokenValid(token, admin.getEmail())) {
+                            UsernamePasswordAuthenticationToken authToken =
+                                    new UsernamePasswordAuthenticationToken(admin, null, null);
+                            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                            SecurityContextHolder.getContext().setAuthentication(authToken);
+                            return true;
+                        }
+                        return false;
+                    }).orElse(false);
+                }
+                // Try regular user authentication if not authenticated as admin
+                if (!authenticated) {
+                    regularUserService.findByEmail(email).ifPresent(user -> {
+                        if (jwtUtil.isTokenValid(token, user.getEmail())) {
+                            UsernamePasswordAuthenticationToken authToken =
+                                    new UsernamePasswordAuthenticationToken(user, null, null);
+                            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                            SecurityContextHolder.getContext().setAuthentication(authToken);
+                        }
+                    });
+                }
             }
         }
 
