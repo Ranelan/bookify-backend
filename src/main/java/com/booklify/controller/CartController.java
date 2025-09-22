@@ -23,13 +23,13 @@ public class CartController {
     private RegularUserRepository regularUserRepository;
 
     @PostMapping("/create")
-    public ResponseEntity<String> createCart(@Valid @RequestBody CartCreateDto cartCreateDto) {
+    public ResponseEntity<Cart> createCart(@Valid @RequestBody CartCreateDto cartCreateDto) {
         RegularUser user = regularUserRepository.findById(cartCreateDto.getRegularUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Cart cart = new Cart();
         cart.setRegularUser(user);
         Cart savedCart = cartService.save(cart);
-        return ResponseEntity.ok("Cart created with ID: " + savedCart.getCartId());
+        return ResponseEntity.ok(savedCart);
     }
 
     @GetMapping("/getById/{id}")
@@ -43,7 +43,7 @@ public class CartController {
 
     @GetMapping("/getByUserId/{userId}")
     public ResponseEntity<Cart> getCartByUserId(@PathVariable Long userId) {
-        Cart cart = cartService.findByRegularUserId(userId);
+        Cart cart = cartService.getCartByUserId(userId);
         if (cart == null) {
             return ResponseEntity.notFound().build();
         }
