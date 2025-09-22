@@ -14,4 +14,3 @@ public class CartCreateDto {
         this.regularUserId = regularUserId;
     }
 }
-

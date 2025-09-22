@@ -37,8 +37,8 @@ public class CartService implements ICartService {
     }
 
     @Override
-    public Cart findByRegularUserId(Long id) {
-        return cartRepository.findByRegularUserId(id).orElse(null);
+    public Cart getCartByUserId(Long regularUserId) {
+        return cartRepository.findByRegularUser_Id(regularUserId).orElse(null);
     }
 
     @Override
@@ -56,12 +56,28 @@ public class CartService implements ICartService {
     }
 
     @Override
-    public Cart update(Cart entity) {
-        // Ensure all cart items reference the parent cart
-        if (entity.getCartItems() != null) {
-            entity.getCartItems().forEach(item -> item.setCart(entity));
+    public Cart update(Cart cartFromClient) {
+        // 1. READ: Fetch the existing cart from the database using the ID from the client object.
+        // This gives us the real, managed entity with all its associations intact.
+        Cart existingCart = cartRepository.findById(cartFromClient.getCartId())
+                .orElseThrow(() -> new RuntimeException("Cart not found with id: " + cartFromClient.getCartId()));
+
+        // The 'existingCart' object now correctly has the RegularUser attached to it.
+
+        // 2. MODIFY: Clear the old items and add the new/updated items from the client.
+        // This is a safe way to synchronize the collection.
+        existingCart.getCartItems().clear();
+        if (cartFromClient.getCartItems() != null) {
+            cartFromClient.getCartItems().forEach(item -> {
+                item.setCart(existingCart); // IMPORTANT: Ensure bidirectional link is correct
+                existingCart.getCartItems().add(item);
+            });
         }
-        return cartRepository.save(entity);
+
+        // 3. WRITE: Save the modified 'existingCart'.
+        // JPA will now correctly persist the changes to the cartItems while preserving the
+        // all-important RegularUser association.
+        return cartRepository.save(existingCart);
     }
 
     @Override

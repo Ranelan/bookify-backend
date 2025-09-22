@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface CartRepository extends JpaRepository <Cart, Long>{
 
-    Optional<Cart> findByRegularUserId(Long id);
+    Optional<Cart> findByRegularUser_Id(Long regularUserId);
 }
