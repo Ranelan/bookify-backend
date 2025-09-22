@@ -1,7 +1,7 @@
 package com.booklify.controller;
 
 import com.booklify.domain.Order;
-
+import com.booklify.dto.OrderCreateDto;
 import com.booklify.service.impl.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,17 +17,13 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/create")
-    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
-        // Validate the order object
-        if (order == null ) {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<?> createOrder(@RequestBody OrderCreateDto orderCreateDto) {
+        try {
+            Order savedOrder = orderService.createOrderFromDto(orderCreateDto);
+            return ResponseEntity.status(201).body(savedOrder);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
-
-        // Save the order using the service
-        Order savedOrder = orderService.save(order);
-
-        // Return the saved order with a 201 Created status
-        return ResponseEntity.status(201).body(savedOrder);
     }
 
     @PutMapping("/update/{orderId}")
