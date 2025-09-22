@@ -16,10 +16,13 @@ public class AddressService implements IAddressService {
     private AddressRepository  addressRepository;
 
 
-
-    @Override
-    public Address save(Address entity) {
-        return addressRepository.save(entity);
+    public Address save(Address address) {
+        // Check if address for this user already exists
+        Optional<Address> existing = addressRepository.findByUser_Id(address.getUser().getId());
+        if (existing.isPresent()) {
+            return existing.get(); // Or throw a custom exception if you want
+        }
+        return addressRepository.save(address);
     }
 
     @Override
@@ -55,5 +58,10 @@ public class AddressService implements IAddressService {
     public void deleteAll() {
         addressRepository.deleteAll();
 
+    }
+
+    @Override
+    public Optional<Address> findByUserId(Long userId) {
+        return addressRepository.findByUser_Id(userId);
     }
 }
