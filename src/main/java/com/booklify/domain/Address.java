@@ -34,6 +34,7 @@ public class Address{
 
     @OneToMany
     @JoinColumn(name = "shipping_address_id")
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<Order> orders;
 
 

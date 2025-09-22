@@ -52,4 +52,11 @@ public class AddressController {
         addressService.deleteAll();
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Address> getAddressByUserId(@PathVariable Long userId) {
+        return addressService.findByUserId(userId)
+                .map(address -> ResponseEntity.ok(address))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }
