@@ -19,6 +19,22 @@ public class ReviewService implements IReviewService {
 
     @Override
     public Review save(Review entity) {
+        if (entity == null) {
+            throw new IllegalArgumentException("Review entity cannot be null");
+        }
+        if (entity.getReviewRating() < 1 || entity.getReviewRating() > 5) {
+            throw new IllegalArgumentException("Review rating must be between 1 and 5");
+        }
+        if (entity.getReviewComment() == null || entity.getReviewComment().trim().isEmpty()) {
+            throw new IllegalArgumentException("Review comment cannot be null or empty");
+        }
+        if (entity.getUser() == null) {
+            throw new IllegalArgumentException("Review user cannot be null");
+        }
+        if (entity.getBook() == null) {
+            throw new IllegalArgumentException("Review book cannot be null");
+        }
+
         return reviewRepository.save(entity);
     }
 
@@ -30,6 +46,19 @@ public class ReviewService implements IReviewService {
 
     @Override
     public Review update(Review entity) {
+        if (entity == null) {
+            throw new IllegalArgumentException("Review entity cannot be null");
+        }
+        if (entity.getReviewId() == null) {
+            throw new IllegalArgumentException("Review ID cannot be null for update");
+        }
+        if (entity.getReviewRating() < 1 || entity.getReviewRating() > 5) {
+            throw new IllegalArgumentException("Review rating must be between 1 and 5");
+        }
+        if (entity.getReviewComment() == null || entity.getReviewComment().trim().isEmpty()) {
+            throw new IllegalArgumentException("Review comment cannot be null or empty");
+        }
+
         Review existing = findById(entity.getReviewId());
 
         Review updatedReview = new Review.Builder()
@@ -61,7 +90,7 @@ public class ReviewService implements IReviewService {
 
     @Override
     public List<Review> getReviewsByRegularUser(Long id) {
-        return reviewRepository.findByUserId(id);
+        return reviewRepository.findByUser_Id(id);
     }
 
     @Override
