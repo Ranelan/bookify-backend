@@ -30,7 +30,7 @@ class AddressControllerTest {
         AddressController controller = new AddressController(addressService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
-        // ✅ Ensure postalCode is "12345" to match test expectations
+
         sampleAddress = new Address(
                 "Buitenkant Street",
                 "Cape Town",
@@ -82,19 +82,21 @@ class AddressControllerTest {
 
     @Test
     void testUpdateAddress() throws Exception {
+        Mockito.when(addressService.findById("12345")).thenReturn(sampleAddress);
         Mockito.when(addressService.update(any(Address.class))).thenReturn(sampleAddress);
 
-        mockMvc.perform(put("/api/addresses")
+        mockMvc.perform(put("/api/addresses/12345")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                            {
-                                "street": "Buitenkant Street",
-                                "city": "Cape Town",
-                                "suburb": "Woodstock",
-                                "province": "Western cape",
-                                "country": "South Africa"
-                            }
-                        """))
+                        {
+                            "street": "Buitenkant Street",
+                            "city": "Cape Town",
+                            "suburb": "Woodstock",
+                            "province": "Western cape",
+                            "country": "South Africa",
+                            "postalCode": "12345"
+                        }
+                    """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.postalCode", is("12345")));
     }
