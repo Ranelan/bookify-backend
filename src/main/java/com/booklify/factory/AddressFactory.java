@@ -7,10 +7,10 @@ import com.booklify.domain.RegularUser;
 import java.util.List;
 
 public class AddressFactory {
-    public static Address createAddress(String street, String suburb, String city, String province, String country, String postalCode){ //RegularUser user, List<Order> orders){
+    public static Address createAddress(String street, String suburb, String city, String province, String country, String postalCode,RegularUser user, List<Order> orders){
 
 
-        if(street == null||street.isEmpty() ){
+        if(street.isEmpty() ){
             return null;
         }
         if(suburb == null||suburb.isEmpty() ){
@@ -30,12 +30,12 @@ public class AddressFactory {
         if (postalCode == null||postalCode.isEmpty()) {
             return null;
         }
-        // if (user == null) {
-        //     return null;
-        // }
-        //if (orders == null) {
-        //   return null;
-        //}
+         if (user == null) {
+             return null;
+        }
+        if (orders == null) {
+          return null;
+        }
         return new Address.Builder()
                 .setStreet(street)
                 .setSuburb(suburb)
@@ -43,8 +43,8 @@ public class AddressFactory {
                 .setProvince(province)
                 .setCountry(country)
                 .setPostalCode(postalCode)
-                //.setUser(user)
-                // .setOrders(orders)
+                .setUser(user)
+                .setOrders(orders)
                 .build();
     }
 
