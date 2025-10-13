@@ -16,6 +16,7 @@ public class JwtUtil {
 
     private final SecretKey key;
     private final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours
+    private final long CLOCK_SKEW = 1000 * 60 * 5; // 5 minutes clock skew
 
     public JwtUtil(@Value("${jwt.secret}") String secret) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
@@ -30,6 +31,14 @@ public class JwtUtil {
                 .compact();
     }
 
+    public String refreshToken(String token) {
+        if (!isTokenExpired(token)) {
+            String email = extractUsername(token);
+            return generateToken(email);
+        }
+        throw new RuntimeException("Cannot refresh expired token");
+    }
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -42,17 +51,27 @@ public class JwtUtil {
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
+                .setAllowedClockSkewSeconds(CLOCK_SKEW / 1000) // Add clock skew allowance
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
 
     public boolean isTokenValid(String token, String email) {
-        final String username = extractUsername(token);
-        return (username.equals(email) && !isTokenExpired(token));
+        try {
+            final String username = extractUsername(token);
+            return (username.equals(email) && !isTokenExpired(token));
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private boolean isTokenExpired(String token) {
-        return extractClaim(token, Claims::getExpiration).before(new Date());
+        try {
+            Date expiration = extractClaim(token, Claims::getExpiration);
+            return expiration.before(new Date(System.currentTimeMillis() - CLOCK_SKEW));
+        } catch (Exception e) {
+            return true;
+        }
     }
 }
