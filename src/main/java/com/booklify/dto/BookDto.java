@@ -20,13 +20,15 @@ public class BookDto {
     private Long userId;
     private String uploaderName;
     private String uploaderEmail;
+    private int available = 1;
 
     public BookDto() {
+        this.available = 1;
     }
 
     public BookDto(Long bookID, String isbn, String title, String author, String publisher,
                    BookCondition condition, Double price, String description,
-                   LocalDateTime uploadedDate, byte[] image) {
+                   LocalDateTime uploadedDate, byte[] image, int available) {
         this.bookID = bookID;
         this.isbn = isbn;
         this.title = title;
@@ -37,6 +39,7 @@ public class BookDto {
         this.description = description;
         this.uploadedDate = uploadedDate;
         this.image = image;
+        this.available = available > 0 ? available : 1;
     }
 
     public static BookDto fromEntity(Book book) {
@@ -50,7 +53,8 @@ public class BookDto {
                 book.getPrice(),
                 book.getDescription(),
                 book.getUploadedDate(),
-                book.getImage()
+                book.getImage(),
+                book.getAvailable()
         );
         if (book.getUser() != null) {
             dto.setUserId(book.getUser().getId());
@@ -73,6 +77,7 @@ public class BookDto {
                 .setDescription(dto.getDescription())
                 .setUploadedDate(dto.getUploadedDate())
                 .setImage(dto.getImage())
+                .setAvailable(dto.getAvailable())
                 .build();
     }
 
@@ -179,6 +184,14 @@ public class BookDto {
         this.uploaderEmail = uploaderEmail;
     }
 
+    public int getAvailable() {
+        return available;
+    }
+
+    public void setAvailable(int available) {
+        this.available = available > 0 ? available : 1;
+    }
+
     @Override
     public String toString() {
         return "BookDto{" +
@@ -198,5 +211,3 @@ public class BookDto {
     }
 
 }
-
-
