@@ -44,6 +44,12 @@ public class Book {
     @JoinColumn(name = "user_id", nullable = false)
     private RegularUser user;
 
+    @Column(nullable = false)
+    private int available;
+
+    @Column(nullable = false)
+    private boolean isAvailable = true;
+
     protected Book(){
 
     }
@@ -60,6 +66,8 @@ public class Book {
         this.uploadedDate = builder.uploadedDate;
         this.user = builder.user;
         this.image = builder.image;
+        this.available = builder.available;
+        this.isAvailable = builder.isAvailable;
 
 
     }
@@ -114,6 +122,27 @@ public class Book {
         return user;
     }
 
+    public int getAvailable() {
+        return available;
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setIsAvailable(boolean isAvailable) {
+        this.isAvailable = isAvailable;
+    }
+
+    public void setAvailable(int available) {
+        this.available = available;
+        if (available > 0) {
+            this.isAvailable = true;
+        } else if (available == 0) {
+            this.isAvailable = false;
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -156,6 +185,8 @@ public class Book {
         private LocalDateTime uploadedDate;
         private RegularUser user;
         private byte[] image;
+        private int available;
+        private boolean isAvailable;
 
 
         public Builder setImage(byte[] image) {
@@ -215,6 +246,16 @@ public class Book {
             return this;
         }
 
+        public Builder setAvailable(int available) {
+            this.available = available;
+            return this;
+        }
+
+        public Builder setIsAvailable(boolean isAvailable) {
+            this.isAvailable = isAvailable;
+            return this;
+        }
+
 
         public Builder copy(Book book){
             this.bookID = book.bookID;
@@ -228,6 +269,8 @@ public class Book {
             this.uploadedDate = book.uploadedDate;
             this.user = book.user;
             this.image = book.image;
+            this.available = book.available;
+            this.isAvailable = book.isAvailable;
             return this;
         }
         public Book build(){
@@ -235,4 +278,3 @@ public class Book {
         }
     }
 }
-
