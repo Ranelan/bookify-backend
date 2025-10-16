@@ -51,7 +51,8 @@ public class BookController {
                 .setPrice(bookDto.getPrice())
                 .setDescription(bookDto.getDescription())
                 .setUploadedDate(bookDto.getUploadedDate())
-                .setUser(user); // Always set user
+                .setUser(user) // Always set user
+                .setAvailable(bookDto.getAvailable()); // Set available from DTO
 
         if (imageFile != null && !imageFile.isEmpty()) {
             builder.setImage(imageFile.getBytes());
@@ -159,4 +160,3 @@ public class BookController {
         return ResponseEntity.ok(dtos);
     }
 }
-
