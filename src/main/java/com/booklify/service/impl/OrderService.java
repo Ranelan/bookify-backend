@@ -145,6 +145,19 @@ public class OrderService implements IOrderService {
             // totalAmount will be calculated by JPA callback
             order.getOrderItems().add(item);
         }
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+
+        // Decrease available books by quantity bought
+        for (OrderItem item : savedOrder.getOrderItems()) {
+            Book book = item.getBook();
+            int newAvailable = book.getAvailable() - item.getQuantity();
+            if (newAvailable < 0) {
+                throw new IllegalStateException("Not enough books available for book id: " + book.getBookID());
+            }
+            book.setAvailable(newAvailable);
+            // No need to set isAvailable manually; handled in setAvailable(int)
+            bookRepository.save(book);
+        }
+        return savedOrder;
     }
 }
