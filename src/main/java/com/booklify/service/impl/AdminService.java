@@ -193,7 +193,7 @@ public class AdminService implements IAdminService {
                 .setIsbn(updatedListing.getIsbn())
                 .setPublisher(updatedListing.getPublisher())
                 .setUploadedDate(updatedListing.getUploadedDate())
-                .setUser(updatedListing.getUser())
+                .setUser(book.getUser()) // Always retain the original user
                 .build();
         bookRepository.save(updated);
     }
