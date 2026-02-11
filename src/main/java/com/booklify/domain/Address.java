@@ -11,10 +11,10 @@ public class Address{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     protected String street ;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     protected String suburb;
 
     @Column(nullable = false)
@@ -34,7 +34,6 @@ public class Address{
 
     @OneToMany
     @JoinColumn(name = "shipping_address_id")
-    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<Order> orders;
 
 
@@ -161,7 +160,7 @@ public class Address{
             return this;
         }
 
-        public Builder setOrder(List<Order> orders) {
+        public Builder setOrders(List<Order> orders) {
             this.orders = orders;
             return this;
         }

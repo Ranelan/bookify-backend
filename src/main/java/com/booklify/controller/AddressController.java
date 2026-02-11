@@ -1,11 +1,13 @@
 package com.booklify.controller;
 
 import com.booklify.domain.Address;
+import com.booklify.dto.AddressDto;
 import com.booklify.service.IAddressService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/addresses")
@@ -18,21 +20,33 @@ public class AddressController {
     }
 
     @PostMapping
-    public ResponseEntity<Address> createAddress(@RequestBody Address address) {
-        Address saved = addressService.save(address);
-        return ResponseEntity.ok(saved);
+    public ResponseEntity<AddressDto> createAddress(@RequestBody AddressDto dto) {
+        Address saved = addressService.save(AddressDto.toEntity(dto));
+        return ResponseEntity.ok(AddressDto.fromEntity(saved));
     }
 
     @GetMapping("/{postalCode}")
-    public ResponseEntity<Address> getAddressByPostalCode(@PathVariable String postalCode) {
+    public ResponseEntity<AddressDto> getAddressByPostalCode(@PathVariable String postalCode) {
         Address found = addressService.findById(postalCode);
-        return found != null ? ResponseEntity.ok(found) : ResponseEntity.notFound().build();
+        return (found != null)
+                ? ResponseEntity.ok(AddressDto.fromEntity(found))
+                : ResponseEntity.notFound().build();
     }
 
-    @PutMapping
-    public ResponseEntity<Address> updateAddress(@RequestBody Address address) {
-        Address updated = addressService.update(address);
-        return ResponseEntity.ok(updated);
+    @PutMapping("/{postalCode}")
+    public ResponseEntity<AddressDto> updateAddress(@PathVariable String postalCode,
+                                                    @RequestBody AddressDto dto) {
+        Address existing = addressService.findById(postalCode);
+        if (existing == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Preserve ID and postalCode from existing entity
+        dto.setId(existing.getId());
+        dto.setPostalCode(postalCode);
+
+        Address updated = addressService.update(AddressDto.toEntity(dto));
+        return ResponseEntity.ok(AddressDto.fromEntity(updated));
     }
 
     @DeleteMapping("/{postalCode}")
@@ -42,9 +56,12 @@ public class AddressController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Address>> getAllAddresses() {
+    public ResponseEntity<List<AddressDto>> getAllAddresses() {
         List<Address> all = addressService.getAll();
-        return ResponseEntity.ok(all);
+        List<AddressDto> dtos = all.stream()
+                .map(AddressDto::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
 
     @DeleteMapping
